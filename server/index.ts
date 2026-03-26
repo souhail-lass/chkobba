@@ -57,6 +57,11 @@ app.get('/robots.txt', (req, res) => {
   res.sendFile(path.join(clientDistPath, 'robots.txt'));
 });
 
+// Prerendered SEO pages (static HTML generated at build time)
+app.get(['/how-to-play', '/how-to-play/'], (_req, res) => {
+  res.sendFile(path.join(clientDistPath, 'how-to-play', 'index.html'));
+});
+
 // Serve static files from client build
 app.use(express.static(clientDistPath));
 

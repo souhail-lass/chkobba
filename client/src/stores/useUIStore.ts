@@ -7,7 +7,7 @@ import {
   normalizeHayyaSfxEmoteId,
 } from '../lib/sfxEmoteDefaults';
 
-export type Screen = 'landing' | 'createRoom' | 'joinRoom' | 'lobby' | 'game';
+export type Screen = 'landing' | 'howToPlay' | 'createRoom' | 'joinRoom' | 'lobby' | 'game';
 export type ToastType = 'info' | 'success' | 'error';
 export type WaitressStatus = 'idle' | 'serving';
 
@@ -70,6 +70,12 @@ const getInitialScreen = (): Screen => {
       }
     }
   } catch (e) {}
+  try {
+    const path = window.location?.pathname || '/';
+    if (path === '/how-to-play' || path === '/how-to-play/') return 'howToPlay';
+  } catch {
+    /* ignore */
+  }
   return 'landing';
 };
 

@@ -9,6 +9,12 @@ client/dist/
 *.tsbuildinfo
 .vercel
 
+# Media / large assets (keep repo lean)
+*.mp3
+*.wav
+*.ogg
+sound_effects/
+
 # Environment variables
 .env
 .env.local

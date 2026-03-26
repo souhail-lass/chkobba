@@ -4,6 +4,7 @@ import { useUIStore } from './stores/useUIStore';
 import { ChatPanel } from './components/layout/ChatPanel';
 import { Toast } from './components/ui/Toast';
 import { LandingScreen } from './components/screens/LandingScreen';
+import { HowToPlayScreen } from './components/screens/HowToPlayScreen';
 import { CreateRoomScreen } from './components/screens/CreateRoomScreen';
 import { JoinRoomScreen } from './components/screens/JoinRoomScreen';
 import { LobbyScreen } from './components/screens/LobbyScreen';
@@ -14,10 +15,28 @@ import { trackPageView } from './lib/analytics';
 export default function App() {
   useSocket();
   const screen = useUIStore((s) => s.screen);
+  const setScreen = useUIStore((s) => s.setScreen);
 
   useEffect(() => {
     trackPageView(screen);
   }, [screen]);
+
+  useEffect(() => {
+    const onPopState = () => {
+      try {
+        const path = window.location.pathname || '/';
+        // Don't hijack in-game or lobby flows (session restore, room state, etc.).
+        const current = useUIStore.getState().screen;
+        if (current === 'game' || current === 'lobby' || current === 'createRoom' || current === 'joinRoom') return;
+        if (path === '/how-to-play' || path === '/how-to-play/') setScreen('howToPlay');
+        else setScreen('landing');
+      } catch {
+        setScreen('landing');
+      }
+    };
+    window.addEventListener('popstate', onPopState);
+    return () => window.removeEventListener('popstate', onPopState);
+  }, [setScreen]);
 
   return (
     <>
@@ -40,6 +59,7 @@ export default function App() {
         <main className="relative z-10 h-full min-h-0">
           <AnimatePresence mode="wait">
             {screen === 'landing' && <LandingScreen key="landing" />}
+            {screen === 'howToPlay' && <HowToPlayScreen key="howToPlay" />}
             {screen === 'createRoom' && <CreateRoomScreen key="createRoom" />}
             {screen === 'joinRoom' && <JoinRoomScreen key="joinRoom" />}
             {screen === 'lobby' && <LobbyScreen key="lobby" />}

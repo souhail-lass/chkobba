@@ -17,7 +17,8 @@ export function LandingScreen() {
   const isSubmitting = useUIStore((s) => s.isSubmitting);
   const setIsSubmitting = useUIStore((s) => s.setIsSubmitting);
   const [rulesOpen, setRulesOpen] = useState(false);
-  const [onlinePlayers, setOnlinePlayers] = useState(() => 12 + Math.floor(Math.random() * 36));
+  // Keep initial render deterministic for prerender + hydration.
+  const [onlinePlayers, setOnlinePlayers] = useState(24);
 
   const validateAndProceed = (target: Screen) => {
     if (isSubmitting) return;
@@ -62,6 +63,7 @@ export function LandingScreen() {
   }, [setIsSubmitting]);
 
   useEffect(() => {
+    setOnlinePlayers(12 + Math.floor(Math.random() * 36));
     const id = window.setInterval(() => {
       setOnlinePlayers(12 + Math.floor(Math.random() * 36));
     }, 30_000);
@@ -118,10 +120,14 @@ export function LandingScreen() {
             className="landing-title-shimmer text-[clamp(2.75rem,12vw,5.25rem)] font-black leading-[0.92] tracking-tight drop-shadow-[0_2px_24px_rgba(212,175,55,0.18)]"
           >
             <span className="relative z-[1] text-transparent bg-clip-text bg-gradient-to-b from-[#f5e6a8] via-brass to-[#a67c1a]">
-              CHKOBBA
+              Chkobba en ligne — jeu de cartes tunisien gratuit
             </span>
           </h1>
-          <p className="mt-4 text-cream/70 text-sm sm:text-[0.95rem] font-ancient tracking-wide max-w-[20rem] mx-auto leading-relaxed">
+          <p className="mt-4 text-cream/80 text-sm sm:text-[0.95rem] font-ancient tracking-wide max-w-[26rem] mx-auto leading-relaxed">
+            Jouez au chkobba en ligne gratuitement. Ce jeu de cartes tunisien multijoueur vous permet de créer une table,
+            inviter vos amis et jouer en temps réel.
+          </p>
+          <p className="mt-3 text-cream/60 text-xs sm:text-sm font-ancient tracking-wide max-w-[22rem] mx-auto leading-relaxed">
             La table du café, avec vos amis — où que vous soyez.
           </p>
           <p
@@ -143,6 +149,24 @@ export function LandingScreen() {
             </span>
             <span className="h-px w-10 bg-gradient-to-l from-transparent to-brass/40" aria-hidden />
           </div>
+
+          <p className="mt-4 text-center text-[11px] sm:text-xs font-ancient text-cream/45">
+            <a
+              href="/how-to-play"
+              onClick={(e) => {
+                e.preventDefault();
+                try {
+                  window.history.pushState({}, '', '/how-to-play');
+                } catch {
+                  /* ignore */
+                }
+                setScreen('howToPlay');
+              }}
+              className="underline decoration-white/20 underline-offset-4 hover:text-brass/90 hover:decoration-brass/40 transition-colors"
+            >
+              Comment jouer (règles)
+            </a>
+          </p>
         </motion.div>
 
         <motion.div
