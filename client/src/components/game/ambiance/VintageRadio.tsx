@@ -13,7 +13,7 @@ declare global {
 const FIRST_VIDEO_ID = 'v7QJlY_WRBs';
 const PLAYLIST_ID = 'RDv7QJlY_WRBs';
 
-export function VintageRadio() {
+export function VintageRadio({ forceExpandedOnMobile = false }: { forceExpandedOnMobile?: boolean } = {}) {
   const [player, setPlayer] = useState<any>(null);
   const [isOn, setIsOn] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
@@ -22,7 +22,9 @@ export function VintageRadio() {
   const [tuningAngle, setTuningAngle] = useState(0);
   const [volumeAngle, setVolumeAngle] = useState(94); // 35% of 270
   const [apiReady, setApiReady] = useState(false);
-  const [isMinimized, setIsMinimized] = useState(() => window.innerWidth < 768);
+  const [isMinimized, setIsMinimized] = useState(
+    () => !forceExpandedOnMobile && window.innerWidth < 768,
+  );
   const playerInitRef = useRef(false);
   const titleRef = useRef<HTMLDivElement>(null);
   const [needsScroll, setNeedsScroll] = useState(false);
@@ -313,9 +315,16 @@ export function VintageRadio() {
     window.addEventListener('resize', onResize);
     return () => window.removeEventListener('resize', onResize);
   }, []);
+  useEffect(() => {
+    if (forceExpandedOnMobile && isMobile) {
+      setIsMinimized(false);
+    }
+  }, [forceExpandedOnMobile, isMobile]);
 
-  const smallKnobSize = isMobile ? 28 : 34;
-  const bigKnobSize = isMobile ? 44 : 52;
+  const isCompactMobile = forceExpandedOnMobile && isMobile;
+
+  const smallKnobSize = isCompactMobile ? 22 : isMobile ? 28 : 34;
+  const bigKnobSize = isCompactMobile ? 34 : isMobile ? 44 : 52;
 
   if (isMinimized) {
     return (
@@ -329,7 +338,13 @@ export function VintageRadio() {
           animate={{ opacity: 1, y: 0 }}
           whileHover={{ scale: 1.1 }}
           whileTap={{ scale: 0.95 }}
-          onClick={() => isMobile ? togglePlay() : setIsMinimized(false)}
+          onClick={() => {
+            if (forceExpandedOnMobile && isMobile) {
+              setIsMinimized(false);
+              return;
+            }
+            isMobile ? togglePlay() : setIsMinimized(false);
+          }}
           className="fixed top-[max(5rem,env(safe-area-inset-top)+1rem)] left-[max(0.5rem,env(safe-area-inset-left))] z-50 cursor-pointer"
           title={isMobile ? (isPlaying ? 'Pause radio' : 'Play radio') : 'Open Radio'}
           aria-label={isMobile ? (isPlaying ? 'Pause café radio' : 'Play café radio') : 'Expand radio controls'}
@@ -378,8 +393,17 @@ export function VintageRadio() {
         initial={{ opacity: 0, y: -40, scale: 0.9 }}
         animate={{ opacity: 1, y: 0, scale: 1 }}
         transition={{ type: 'spring', stiffness: 200, damping: 20 }}
-        className="fixed top-[max(1rem,env(safe-area-inset-top)+0.5rem)] left-[max(1rem,env(safe-area-inset-left))] z-50 select-none hidden md:block max-[height:920px]:origin-top-left max-[height:920px]:scale-[0.88] max-[height:780px]:scale-[0.8]"
-        style={{ width: isMobile ? 208 : 276, maxWidth: 'min(276px, calc(100vw - 20rem))' }}
+        className={`fixed left-[max(0.5rem,env(safe-area-inset-left))] ${
+          isCompactMobile
+            ? 'bottom-[max(3.9rem,env(safe-area-inset-bottom)+3.45rem)] origin-bottom-left'
+            : 'top-[max(1rem,env(safe-area-inset-top)+0.5rem)]'
+        } z-50 select-none ${
+          isMobile ? '' : 'max-[height:920px]:origin-top-left max-[height:920px]:scale-[0.88] max-[height:780px]:scale-[0.8]'
+        }`}
+        style={{
+          width: isCompactMobile ? 152 : isMobile ? 208 : 276,
+          maxWidth: isMobile ? 'calc(100vw - 1rem)' : 'min(276px, calc(100vw - 20rem))',
+        }}
         role="group"
         aria-label="Radio du café — affichage du titre, réglage, lecture et pistes."
       >
@@ -387,7 +411,7 @@ export function VintageRadio() {
         <div
           style={{
             ...woodBase,
-            borderRadius: isMobile ? 12 : 16,
+            borderRadius: isCompactMobile ? 10 : isMobile ? 12 : 16,
             boxShadow: cabinetShadow,
             border: '2px solid #2a1508',
             padding: 0,
@@ -422,40 +446,42 @@ export function VintageRadio() {
               display: 'flex',
               justifyContent: 'center',
               position: 'relative',
-              top: isMobile ? -4 : -6,
+              top: isCompactMobile ? -2 : isMobile ? -4 : -6,
               zIndex: 2,
               cursor: 'pointer',
             }}
-            onClick={() => setIsMinimized(true)}
+            onClick={() => {
+              if (!isMobile || !forceExpandedOnMobile) setIsMinimized(true);
+            }}
             title="Minimize radio"
           >
             <div style={{ display: 'flex', alignItems: 'flex-end', gap: 0 }}>
               <div
                 style={{
-                  width: isMobile ? 7 : 10,
-                  height: isMobile ? 12 : 18,
-                  borderLeft: `${isMobile ? 2 : 3}px solid #6a6a6a`,
-                  borderTop: `${isMobile ? 2 : 3}px solid #8a8a8a`,
+                  width: isCompactMobile ? 5 : isMobile ? 7 : 10,
+                  height: isCompactMobile ? 8 : isMobile ? 12 : 18,
+                  borderLeft: `${isCompactMobile ? 1.5 : isMobile ? 2 : 3}px solid #6a6a6a`,
+                  borderTop: `${isCompactMobile ? 1.5 : isMobile ? 2 : 3}px solid #8a8a8a`,
                   borderRadius: '4px 0 0 0',
                   background: 'transparent',
                 }}
               />
               <div
                 style={{
-                  width: isMobile ? 48 : 72,
-                  height: isMobile ? 5 : 8,
+                  width: isCompactMobile ? 34 : isMobile ? 48 : 72,
+                  height: isCompactMobile ? 4 : isMobile ? 5 : 8,
                   background: 'linear-gradient(180deg, #b8b8b8 0%, #707070 45%, #909090 60%, #787878 100%)',
                   borderRadius: '4px 4px 0 0',
                   boxShadow: '0 -2px 5px rgba(0,0,0,0.45), inset 0 1px 1px rgba(255,255,255,0.35)',
-                  marginBottom: isMobile ? 6 : 10,
+                  marginBottom: isCompactMobile ? 3 : isMobile ? 6 : 10,
                 }}
               />
               <div
                 style={{
-                  width: isMobile ? 7 : 10,
-                  height: isMobile ? 12 : 18,
-                  borderRight: `${isMobile ? 2 : 3}px solid #6a6a6a`,
-                  borderTop: `${isMobile ? 2 : 3}px solid #8a8a8a`,
+                  width: isCompactMobile ? 5 : isMobile ? 7 : 10,
+                  height: isCompactMobile ? 8 : isMobile ? 12 : 18,
+                  borderRight: `${isCompactMobile ? 1.5 : isMobile ? 2 : 3}px solid #6a6a6a`,
+                  borderTop: `${isCompactMobile ? 1.5 : isMobile ? 2 : 3}px solid #8a8a8a`,
                   borderRadius: '0 4px 0 0',
                   background: 'transparent',
                 }}
@@ -463,7 +489,7 @@ export function VintageRadio() {
             </div>
           </div>
 
-          <div style={{ padding: isMobile ? '0 10px 10px 10px' : '0 14px 12px 14px' }}>
+          <div style={{ padding: isCompactMobile ? '0 7px 7px 7px' : isMobile ? '0 10px 10px 10px' : '0 14px 12px 14px' }}>
             {/* Top: engraved RADIO + power + café strip */}
             <div
               style={{
@@ -471,19 +497,19 @@ export function VintageRadio() {
                 alignItems: 'center',
                 justifyContent: 'space-between',
                 gap: 8,
-                marginBottom: isMobile ? 8 : 10,
-                padding: isMobile ? '6px 10px' : '7px 12px',
+                marginBottom: isCompactMobile ? 5 : isMobile ? 8 : 10,
+                padding: isCompactMobile ? '4px 7px' : isMobile ? '6px 10px' : '7px 12px',
                 borderRadius: 8,
                 background: 'linear-gradient(180deg, rgba(0,0,0,0.35) 0%, rgba(0,0,0,0.55) 100%)',
                 border: '1px solid rgba(0,0,0,0.45)',
                 boxShadow: 'inset 0 2px 4px rgba(0,0,0,0.5), inset 0 -1px 0 rgba(255,200,160,0.04)',
               }}
             >
-              <div style={{ display: 'flex', alignItems: 'center', gap: isMobile ? 8 : 10 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: isCompactMobile ? 5 : isMobile ? 8 : 10 }}>
                 <span
                   style={{
                     fontFamily: 'Georgia, "Times New Roman", serif',
-                    fontSize: isMobile ? 11 : 13,
+                    fontSize: isCompactMobile ? 9 : isMobile ? 11 : 13,
                     fontWeight: 700,
                     fontVariant: 'small-caps',
                     letterSpacing: '0.32em',
@@ -528,7 +554,7 @@ export function VintageRadio() {
               </div>
               <span
                 style={{
-                  fontSize: isMobile ? 7 : 8,
+                  fontSize: isCompactMobile ? 6 : isMobile ? 7 : 8,
                   color: 'rgba(255,220,180,0.38)',
                   letterSpacing: '0.14em',
                   whiteSpace: 'nowrap',
@@ -539,7 +565,7 @@ export function VintageRadio() {
             </div>
 
             {/* Tuning knob | speaker (track title on grille) | volume */}
-            <div style={{ display: 'flex', alignItems: 'center', gap: isMobile ? 6 : 8, marginBottom: isMobile ? 8 : 10 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: isCompactMobile ? 4 : isMobile ? 6 : 8, marginBottom: isCompactMobile ? 5 : isMobile ? 8 : 10 }}>
               <div
                 ref={tuningKnobRef}
                 onMouseDown={handleTuningKnobDown}
@@ -600,8 +626,8 @@ export function VintageRadio() {
                 style={{
                   ...marshallGrille,
                   flex: 1,
-                  minHeight: isMobile ? 72 : 88,
-                  height: isMobile ? 72 : 88,
+                  minHeight: isCompactMobile ? 54 : isMobile ? 72 : 88,
+                  height: isCompactMobile ? 54 : isMobile ? 72 : 88,
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
@@ -612,14 +638,14 @@ export function VintageRadio() {
                 role="group"
                 aria-label="Now playing"
               >
-                {(isMobile ? [0, 1, 2, 3, 4] : [0, 1, 2, 3, 4, 5, 6]).map((i) => (
+                {(isCompactMobile ? [0, 1, 2, 3] : isMobile ? [0, 1, 2, 3, 4] : [0, 1, 2, 3, 4, 5, 6]).map((i) => (
                   <div
                     key={i}
                     style={{
                       position: 'absolute',
-                      left: isMobile ? 5 : 8,
-                      right: isMobile ? 5 : 8,
-                      top: (isMobile ? 5 : 8) + i * (isMobile ? 8 : 9),
+                      left: isCompactMobile ? 4 : isMobile ? 5 : 8,
+                      right: isCompactMobile ? 4 : isMobile ? 5 : 8,
+                      top: (isCompactMobile ? 4 : isMobile ? 5 : 8) + i * (isCompactMobile ? 7 : isMobile ? 8 : 9),
                       height: 1,
                       background: 'rgba(139,105,20,0.12)',
                       zIndex: 1,
@@ -630,7 +656,7 @@ export function VintageRadio() {
                 <div
                   style={{
                     position: 'absolute',
-                    inset: isMobile ? 7 : 10,
+                    inset: isCompactMobile ? 5 : isMobile ? 7 : 10,
                     borderRadius: 6,
                     background: 'rgba(0,0,0,0.62)',
                     border: '1px solid rgba(212,175,55,0.28)',
@@ -638,7 +664,7 @@ export function VintageRadio() {
                     zIndex: 4,
                     display: 'flex',
                     alignItems: 'center',
-                    padding: isMobile ? '6px 8px' : '8px 10px',
+                    padding: isCompactMobile ? '4px 6px' : isMobile ? '6px 8px' : '8px 10px',
                     overflow: 'hidden',
                   }}
                 >
@@ -647,7 +673,7 @@ export function VintageRadio() {
                     style={{
                       width: '100%',
                       overflow: 'hidden',
-                      minHeight: isMobile ? 28 : 32,
+                      minHeight: isCompactMobile ? 22 : isMobile ? 28 : 32,
                       display: 'flex',
                       alignItems: 'center',
                     }}
@@ -664,7 +690,7 @@ export function VintageRadio() {
                         <span
                           style={{
                             fontFamily: '"Courier New", monospace',
-                            fontSize: isMobile ? 9 : 11,
+                            fontSize: isCompactMobile ? 7 : isMobile ? 9 : 11,
                             fontWeight: 700,
                             color: '#ecfccb',
                             textShadow:
@@ -679,7 +705,7 @@ export function VintageRadio() {
                           style={{
                             paddingLeft: '2.5rem',
                             fontFamily: '"Courier New", monospace',
-                            fontSize: isMobile ? 9 : 11,
+                            fontSize: isCompactMobile ? 7 : isMobile ? 9 : 11,
                             fontWeight: 700,
                             color: '#ecfccb',
                             textShadow:
@@ -694,7 +720,7 @@ export function VintageRadio() {
                       <motion.span
                         style={{
                           fontFamily: '"Courier New", monospace',
-                          fontSize: isMobile ? 9 : 10,
+                          fontSize: isCompactMobile ? 7 : isMobile ? 9 : 10,
                           fontWeight: 600,
                           color: 'rgba(212,175,55,0.85)',
                           letterSpacing: '0.08em',
@@ -708,7 +734,7 @@ export function VintageRadio() {
                       <span
                         style={{
                           fontFamily: '"Courier New", monospace',
-                          fontSize: isMobile ? 9 : 10,
+                          fontSize: isCompactMobile ? 7 : isMobile ? 9 : 10,
                           fontWeight: 600,
                           color: 'rgba(212,175,55,0.4)',
                           letterSpacing: '0.15em',
@@ -786,8 +812,8 @@ export function VintageRadio() {
                 display: 'flex',
                 justifyContent: 'center',
                 alignItems: 'center',
-                gap: isMobile ? 10 : 14,
-                marginBottom: isMobile ? 6 : 8,
+                gap: isCompactMobile ? 6 : isMobile ? 10 : 14,
+                marginBottom: isCompactMobile ? 4 : isMobile ? 6 : 8,
               }}
             >
               <motion.button
@@ -808,7 +834,7 @@ export function VintageRadio() {
                   alignItems: 'center',
                   justifyContent: 'center',
                   color: '#2a1a06',
-                  fontSize: isMobile ? 13 : 15,
+                  fontSize: isCompactMobile ? 11 : isMobile ? 13 : 15,
                   lineHeight: 1,
                   padding: 0,
                 }}
@@ -823,8 +849,8 @@ export function VintageRadio() {
                 title={!isOn ? 'Allumer et lire' : isPlaying ? 'Pause' : 'Lecture'}
                 aria-label={!isOn ? 'Allumer la radio' : isPlaying ? 'Pause' : 'Lecture'}
                 style={{
-                  width: smallKnobSize + (isMobile ? 4 : 6),
-                  height: smallKnobSize + (isMobile ? 4 : 6),
+                  width: smallKnobSize + (isCompactMobile ? 2 : isMobile ? 4 : 6),
+                  height: smallKnobSize + (isCompactMobile ? 2 : isMobile ? 4 : 6),
                   borderRadius: '50%',
                   ...brushedGoldBtn,
                   border: '1px solid rgba(0,0,0,0.35)',
@@ -833,7 +859,7 @@ export function VintageRadio() {
                   alignItems: 'center',
                   justifyContent: 'center',
                   color: '#2a1a06',
-                  fontSize: isMobile ? 15 : 17,
+                  fontSize: isCompactMobile ? 12 : isMobile ? 15 : 17,
                   lineHeight: 1,
                   padding: 0,
                 }}
@@ -858,7 +884,7 @@ export function VintageRadio() {
                   alignItems: 'center',
                   justifyContent: 'center',
                   color: '#2a1a06',
-                  fontSize: isMobile ? 13 : 15,
+                  fontSize: isCompactMobile ? 11 : isMobile ? 13 : 15,
                   lineHeight: 1,
                   padding: 0,
                 }}
@@ -873,8 +899,8 @@ export function VintageRadio() {
                 title={isWaitressVisible ? 'Renvoyer la serveuse' : 'Appeler la serveuse'}
                 aria-label={isWaitressVisible ? 'Renvoyer la serveuse' : 'Appeler la serveuse'}
                 style={{
-                  width: smallKnobSize - 6,
-                  height: smallKnobSize - 6,
+                  width: smallKnobSize - (isCompactMobile ? 4 : 6),
+                  height: smallKnobSize - (isCompactMobile ? 4 : 6),
                   borderRadius: '50%',
                   ...brushedGoldBtn,
                   border: '1px solid rgba(0,0,0,0.35)',
@@ -882,7 +908,7 @@ export function VintageRadio() {
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  fontSize: isMobile ? 12 : 14,
+                  fontSize: isCompactMobile ? 10 : isMobile ? 12 : 14,
                   lineHeight: 1,
                   padding: 0,
                   boxShadow: isWaitressVisible
@@ -896,21 +922,21 @@ export function VintageRadio() {
 
             <div
               style={{
-                marginTop: isMobile ? 2 : 4,
-                height: isMobile ? 2 : 3,
+                marginTop: isCompactMobile ? 1 : isMobile ? 2 : 4,
+                height: isCompactMobile ? 1 : isMobile ? 2 : 3,
                 background:
                   'linear-gradient(90deg, transparent, rgba(212,175,55,0.18) 22%, rgba(212,175,55,0.28) 50%, rgba(212,175,55,0.18) 78%, transparent)',
                 borderRadius: 2,
               }}
             />
 
-            <div style={{ display: 'flex', justifyContent: 'space-between', padding: isMobile ? '0 12px' : '0 16px', marginTop: 4 }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', padding: isCompactMobile ? '0 8px' : isMobile ? '0 12px' : '0 16px', marginTop: isCompactMobile ? 2 : 4 }}>
               {[0, 1].map((i) => (
                 <div
                   key={i}
                   style={{
-                    width: isMobile ? 12 : 16,
-                    height: isMobile ? 3 : 4,
+                    width: isCompactMobile ? 9 : isMobile ? 12 : 16,
+                    height: isCompactMobile ? 2 : isMobile ? 3 : 4,
                     background: 'linear-gradient(180deg, #4a2810, #1f0c04)',
                     borderRadius: '0 0 5px 5px',
                     boxShadow: '0 3px 4px rgba(0,0,0,0.5)',
@@ -925,9 +951,9 @@ export function VintageRadio() {
           style={{
             display: 'flex',
             justifyContent: 'space-between',
-            padding: isMobile ? '3px 16px 0' : '4px 20px 0',
+            padding: isCompactMobile ? '2px 10px 0' : isMobile ? '3px 16px 0' : '4px 20px 0',
             fontFamily: '"Courier New", serif',
-            fontSize: isMobile ? 6 : 7,
+            fontSize: isCompactMobile ? 5 : isMobile ? 6 : 7,
             color: 'rgba(212,175,55,0.42)',
             letterSpacing: 1,
             textTransform: 'uppercase',

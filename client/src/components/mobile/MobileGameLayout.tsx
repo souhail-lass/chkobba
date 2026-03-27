@@ -35,8 +35,8 @@ export function MobileGameLayout({
 
   return (
     <>
-      {/* Mobile Radio - minimized icon */}
-      <VintageRadio />
+      {/* Mobile Radio - full controls */}
+      <VintageRadio forceExpandedOnMobile />
 
       {/* 4-Row CSS Grid Layout */}
       <div

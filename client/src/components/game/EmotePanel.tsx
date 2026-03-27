@@ -46,7 +46,13 @@ function CelebrationPickRow({
  * Sound emotes + two scrollable default slots (7 Haya / Chkobba fanfare).
  * Celebration columns: icon-only. Main grid: icon + label together.
  */
-export function EmotePanel({ alignPopoverRight = false }: { alignPopoverRight?: boolean }) {
+export function EmotePanel({
+  alignPopoverRight = false,
+  embedded = false,
+}: {
+  alignPopoverRight?: boolean;
+  embedded?: boolean;
+}) {
   const [open, setOpen] = useState(false);
   const lastEmitAt = useRef(0);
 
@@ -67,103 +73,112 @@ export function EmotePanel({ alignPopoverRight = false }: { alignPopoverRight?: 
     setOpen(false);
   }, []);
 
+  const panel = (
+    <motion.div
+      initial={embedded ? false : { opacity: 0, y: 8, scale: 0.96 }}
+      animate={{ opacity: 1, y: 0, scale: 1 }}
+      exit={embedded ? undefined : { opacity: 0, y: 6, scale: 0.98 }}
+      transition={embedded ? { duration: 0 } : { type: 'spring', stiffness: 420, damping: 32 }}
+      className={
+        embedded
+          ? 'w-full max-h-[min(58vh,540px)] overflow-y-auto rounded-xl border-2 border-[#b8942f]/60 bg-[#0f2419]/98 shadow-[0_12px_40px_rgba(0,0,0,0.55)] p-2'
+          : `absolute bottom-full mb-2 w-[min(20rem,calc(100vw-8rem))] sm:w-[min(22rem,calc(100vw-1.5rem))] max-h-[min(70vh,560px)] overflow-y-auto rounded-xl border-2 border-[#b8942f]/60 bg-[#0f2419]/98 shadow-[0_12px_40px_rgba(0,0,0,0.55)] p-2 z-[220] ${alignPopoverRight ? 'right-0 left-auto' : 'left-0 right-auto'}`
+      }
+      role="dialog"
+      aria-label="Sound emotes"
+    >
+      <div className="grid grid-cols-2 gap-2 mb-3">
+        <div className="min-w-0 flex flex-col">
+          <div className="mb-1 text-center">
+            <div className="text-[9px] font-ancient uppercase tracking-[0.28em] text-orange-300/90">7 Haya</div>
+            <div className="text-[8px] text-cream/40 font-ancient mt-0.5">
+              Default:{' '}
+              {getEmoteById(sfxHayyaId)?.label ?? getEmoteById(DEFAULT_HAYYA_SFX_EMOTE_ID)?.label ?? '—'}
+            </div>
+          </div>
+          <div
+            className="h-[9.5rem] overflow-y-auto rounded-lg border border-orange-500/25 bg-black/30 hide-scrollbar scroll-smooth touch-pan-y"
+            role="listbox"
+            aria-label="Default Haya celebration sound"
+          >
+            <div className="flex flex-col gap-1 p-1">
+              {EMOTE_LIST.map((e) => (
+                <CelebrationPickRow
+                  key={`h-${e.id}`}
+                  e={e}
+                  variant="haya"
+                  selected={sfxHayyaId === e.id}
+                  onPick={() => setSfxHayya(e.id)}
+                />
+              ))}
+            </div>
+          </div>
+        </div>
+
+        <div className="min-w-0 flex flex-col">
+          <div className="mb-1 text-center">
+            <div className="text-[9px] font-ancient uppercase tracking-[0.28em] text-[#d4af37]/90">Chkobba</div>
+            <div className="text-[8px] text-cream/40 font-ancient mt-0.5">
+              Default:{' '}
+              {getEmoteById(sfxChkobbaId)?.label ?? getEmoteById(DEFAULT_CHKOBBA_SFX_EMOTE_ID)?.label ?? '—'}
+            </div>
+          </div>
+          <div
+            className="h-[9.5rem] overflow-y-auto rounded-lg border border-[#b8942f]/30 bg-black/30 hide-scrollbar scroll-smooth touch-pan-y"
+            role="listbox"
+            aria-label="Default Chkobba celebration sound"
+          >
+            <div className="flex flex-col gap-1 p-1">
+              {EMOTE_LIST.map((e) => (
+                <CelebrationPickRow
+                  key={`c-${e.id}`}
+                  e={e}
+                  variant="chkobba"
+                  selected={sfxChkobbaId === e.id}
+                  onPick={() => setSfxChkobba(e.id)}
+                />
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div className="border-t border-[#b8942f]/20 pt-2">
+        <div className="text-[8px] font-ancient uppercase tracking-widest text-cream/45 text-center mb-1.5">
+          Table emotes
+        </div>
+        <div className="grid grid-cols-5 gap-1.5">
+          {EMOTE_LIST.map((e) => (
+            <button
+              key={e.id}
+              type="button"
+              onClick={() => send(e.id)}
+              className="flex flex-col items-center justify-center gap-0.5 rounded-lg border border-[#b8942f]/25 bg-black/35 px-0.5 py-1.5 hover:bg-[#1a3d2b]/90 hover:border-brass/50 transition-colors min-h-[3.75rem]"
+              title={e.label}
+              aria-label={e.label}
+            >
+              <span className="text-lg sm:text-xl leading-none" aria-hidden>
+                {e.icon}
+              </span>
+              <span className="text-[7px] font-ancient text-cream/80 text-center leading-tight px-0.5 line-clamp-2">
+                {e.label}
+              </span>
+            </button>
+          ))}
+        </div>
+      </div>
+    </motion.div>
+  );
+
+  if (embedded) {
+    return <div className="w-full pointer-events-auto">{panel}</div>;
+  }
+
   return (
     <div className="relative shrink-0 pointer-events-auto">
       <AnimatePresence>
-        {open && (
-          <motion.div
-            initial={{ opacity: 0, y: 8, scale: 0.96 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: 6, scale: 0.98 }}
-            transition={{ type: 'spring', stiffness: 420, damping: 32 }}
-            className={`absolute bottom-full mb-2 w-[min(20rem,calc(100vw-8rem))] sm:w-[min(22rem,calc(100vw-1.5rem))] max-h-[min(70vh,560px)] overflow-y-auto rounded-xl border-2 border-[#b8942f]/60 bg-[#0f2419]/98 shadow-[0_12px_40px_rgba(0,0,0,0.55)] p-2 z-[220] left-0 right-auto`}
-            role="dialog"
-            aria-label="Sound emotes"
-          >
-            <div className="grid grid-cols-2 gap-2 mb-3">
-              <div className="min-w-0 flex flex-col">
-                <div className="mb-1 text-center">
-                  <div className="text-[9px] font-ancient uppercase tracking-[0.28em] text-orange-300/90">7 Haya</div>
-                  <div className="text-[8px] text-cream/40 font-ancient mt-0.5">
-                    Default:{' '}
-                    {getEmoteById(sfxHayyaId)?.label ?? getEmoteById(DEFAULT_HAYYA_SFX_EMOTE_ID)?.label ?? '—'}
-                  </div>
-                </div>
-                <div
-                  className="h-[9.5rem] overflow-y-auto rounded-lg border border-orange-500/25 bg-black/30 hide-scrollbar scroll-smooth touch-pan-y"
-                  role="listbox"
-                  aria-label="Default Haya celebration sound"
-                >
-                  <div className="flex flex-col gap-1 p-1">
-                    {EMOTE_LIST.map((e) => (
-                      <CelebrationPickRow
-                        key={`h-${e.id}`}
-                        e={e}
-                        variant="haya"
-                        selected={sfxHayyaId === e.id}
-                        onPick={() => setSfxHayya(e.id)}
-                      />
-                    ))}
-                  </div>
-                </div>
-              </div>
-
-              <div className="min-w-0 flex flex-col">
-                <div className="mb-1 text-center">
-                  <div className="text-[9px] font-ancient uppercase tracking-[0.28em] text-[#d4af37]/90">Chkobba</div>
-                  <div className="text-[8px] text-cream/40 font-ancient mt-0.5">
-                    Default:{' '}
-                    {getEmoteById(sfxChkobbaId)?.label ?? getEmoteById(DEFAULT_CHKOBBA_SFX_EMOTE_ID)?.label ?? '—'}
-                  </div>
-                </div>
-                <div
-                  className="h-[9.5rem] overflow-y-auto rounded-lg border border-[#b8942f]/30 bg-black/30 hide-scrollbar scroll-smooth touch-pan-y"
-                  role="listbox"
-                  aria-label="Default Chkobba celebration sound"
-                >
-                  <div className="flex flex-col gap-1 p-1">
-                    {EMOTE_LIST.map((e) => (
-                      <CelebrationPickRow
-                        key={`c-${e.id}`}
-                        e={e}
-                        variant="chkobba"
-                        selected={sfxChkobbaId === e.id}
-                        onPick={() => setSfxChkobba(e.id)}
-                      />
-                    ))}
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div className="border-t border-[#b8942f]/20 pt-2">
-              <div className="text-[8px] font-ancient uppercase tracking-widest text-cream/45 text-center mb-1.5">
-                Table emotes
-              </div>
-              <div className="grid grid-cols-5 gap-1.5">
-                {EMOTE_LIST.map((e) => (
-                  <button
-                    key={e.id}
-                    type="button"
-                    onClick={() => send(e.id)}
-                    className="flex flex-col items-center justify-center gap-0.5 rounded-lg border border-[#b8942f]/25 bg-black/35 px-0.5 py-1.5 hover:bg-[#1a3d2b]/90 hover:border-brass/50 transition-colors min-h-[3.75rem]"
-                    title={e.label}
-                    aria-label={e.label}
-                  >
-                    <span className="text-lg sm:text-xl leading-none" aria-hidden>
-                      {e.icon}
-                    </span>
-                    <span className="text-[7px] font-ancient text-cream/80 text-center leading-tight px-0.5 line-clamp-2">
-                      {e.label}
-                    </span>
-                  </button>
-                ))}
-              </div>
-            </div>
-          </motion.div>
-        )}
+        {open && panel}
       </AnimatePresence>
-
       <button
         type="button"
         onClick={() => setOpen((o) => !o)}

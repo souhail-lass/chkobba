@@ -43,7 +43,7 @@ export function TurnIndicator() {
         animate={{ opacity: 1, y: 0 }}
         exit={{ opacity: 0, y: 12 }}
         transition={{ duration: 0.35, type: 'spring', stiffness: 200 }}
-        className="flex-shrink-0 w-full flex items-center justify-center pointer-events-none px-2 py-1 z-[25]"
+        className="flex-shrink-0 w-full flex items-center justify-center pointer-events-none px-2 py-0 -mb-1 z-[25]"
       >
         <div className="relative w-full max-w-sm flex items-center justify-center">
           <motion.div

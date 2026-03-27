@@ -145,7 +145,7 @@ export function PlayerHand({ hidePlayButton }: { hidePlayButton?: boolean } = {}
   const canClickPlay = canPlay && !playPending;
 
   return (
-    <div className="flex flex-col items-center gap-2 sm:gap-4 w-full relative mt-auto">
+    <div className="flex flex-col items-center gap-1 sm:gap-2 w-full relative mt-auto">
       <AnimatePresence>
         {isMyTurn && (
           <motion.div

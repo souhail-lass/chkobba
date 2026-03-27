@@ -184,7 +184,7 @@ export function MobileActionBar({ roomId, onCopyCode, copied }: MobileActionBarP
           </div>
           <div>
             <div className="text-[9px] font-ancient uppercase tracking-widest text-cream/50 mb-2">Emotes</div>
-            <EmotePanel />
+            <EmotePanel embedded />
           </div>
         </div>
       </BottomSheet>
