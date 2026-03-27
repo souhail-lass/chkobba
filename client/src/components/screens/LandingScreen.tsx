@@ -75,10 +75,10 @@ export function LandingScreen() {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="min-h-[100dvh] relative overflow-x-hidden overflow-y-auto bg-transparent flex flex-col"
+      className="min-h-[100dvh] relative overflow-y-auto bg-transparent flex flex-col"
       aria-labelledby="landing-title"
     >
-      <h2 className="sr-only">Chkobba — jeu de cartes tunisien multijoueur en ligne</h2>
+      <h2 className="sr-only">Chkobba — online multiplayer Tunisian card game</h2>
 
       {/* Ambient depth — no copy, pure atmosphere */}
       <div
@@ -113,23 +113,18 @@ export function LandingScreen() {
           className="mb-9 sm:mb-11 text-center w-full"
         >
           <p className="mb-3 inline-flex items-center justify-center rounded-full border border-brass/25 bg-black/25 px-3 py-1 text-[10px] font-ancient uppercase tracking-[0.28em] text-brass/80 backdrop-blur-sm">
-            Multijoueur · Navigateur
+            Multiplayer
           </p>
           <h1
             id="landing-title"
-            className="landing-title-shimmer text-[clamp(2.75rem,12vw,5.25rem)] font-black leading-[0.92] tracking-tight drop-shadow-[0_2px_24px_rgba(212,175,55,0.18)]"
+            className="text-[clamp(1.82rem,7.4vw,3.65rem)] font-black leading-[0.9] tracking-tight drop-shadow-[0_2px_24px_rgba(212,175,55,0.18)] overflow-visible px-1"
           >
             <span className="relative z-[1] text-transparent bg-clip-text bg-gradient-to-b from-[#f5e6a8] via-brass to-[#a67c1a]">
-              Chkobba en ligne — jeu de cartes tunisien gratuit
+              <span className="landing-title-shimmer block uppercase tracking-[0.045em] px-[0.08em] overflow-visible">
+                CHKOBBA
+              </span>
             </span>
           </h1>
-          <p className="mt-4 text-cream/80 text-sm sm:text-[0.95rem] font-ancient tracking-wide max-w-[26rem] mx-auto leading-relaxed">
-            Jouez au chkobba en ligne gratuitement. Ce jeu de cartes tunisien multijoueur vous permet de créer une table,
-            inviter vos amis et jouer en temps réel.
-          </p>
-          <p className="mt-3 text-cream/60 text-xs sm:text-sm font-ancient tracking-wide max-w-[22rem] mx-auto leading-relaxed">
-            La table du café, avec vos amis — où que vous soyez.
-          </p>
           <p
             className="mt-5 flex flex-wrap items-center justify-center gap-x-2 gap-y-1 text-lg sm:text-xl text-brass/85 tabular-nums tracking-tight"
             aria-hidden
@@ -145,7 +140,7 @@ export function LandingScreen() {
           <div className="mt-5 flex items-center justify-center gap-3 opacity-90">
             <span className="h-px w-10 bg-gradient-to-r from-transparent to-brass/40" aria-hidden />
             <span className="text-[10px] sm:text-xs font-ancient tracking-[0.32em] text-brass/75 uppercase">
-              Café & cartes
+              Cafe & cards
             </span>
             <span className="h-px w-10 bg-gradient-to-l from-transparent to-brass/40" aria-hidden />
           </div>
@@ -164,7 +159,7 @@ export function LandingScreen() {
               }}
               className="underline decoration-white/20 underline-offset-4 hover:text-brass/90 hover:decoration-brass/40 transition-colors"
             >
-              Comment jouer (règles)
+              How to play (rules)
             </a>
           </p>
         </motion.div>
@@ -180,8 +175,8 @@ export function LandingScreen() {
 
           <div className="space-y-7 relative z-10">
             <Input
-              label="Pseudo"
-              placeholder="Votre nom à la table…"
+              label="Nickname"
+              placeholder="Your name at the table…"
               value={nickname}
               onChange={setNicknameLocal}
               maxLength={15}
@@ -197,10 +192,10 @@ export function LandingScreen() {
                 onClick={() => validateAndProceed('createRoom')}
                 disabled={isSubmitting}
                 variant="brass"
-                size="xl"
-                className="landing-btn-brass-shimmer w-full shadow-lg shadow-black/30"
+                size="lg"
+                className="landing-btn-brass-shimmer w-full shadow-lg shadow-black/30 !py-[1.15rem] !text-[1.02rem] !tracking-[0.19em]"
               >
-                {isSubmitting ? 'Ouverture…' : 'Créer une table'}
+                {isSubmitting ? 'Opening…' : 'Create a table'}
               </Button>
 
               <Button
@@ -208,9 +203,9 @@ export function LandingScreen() {
                 onClick={() => validateAndProceed('joinRoom')}
                 disabled={isSubmitting}
                 size="lg"
-                className="w-full text-cream/90 hover:bg-white/[0.06]"
+                className="w-full text-cream/90 hover:bg-white/[0.06] !py-4 !text-[0.98rem] !tracking-[0.16em]"
               >
-                Rejoindre une salle
+                Join a room
               </Button>
 
               <button
@@ -230,7 +225,7 @@ export function LandingScreen() {
                 <span>
                   <span className="tabular-nums text-cream/55">{onlinePlayers}</span>
                   {' '}
-                  joueurs en ligne
+                  players online
                 </span>
               </div>
             </div>
@@ -247,7 +242,7 @@ export function LandingScreen() {
                   disabled={isSubmitting}
                   className="w-full py-4 rounded-2xl border-brass/25"
                 >
-                  Reprendre la partie
+                  Resume game
                 </Button>
               </motion.div>
             )}

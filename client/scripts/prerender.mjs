@@ -24,11 +24,11 @@ function rewriteSeoHead(html, route) {
       .replaceAll('content="https://chkobba.app/"', `content="${url}"`)
       .replace(
         /<title>.*?<\/title>/,
-        '<title>Comment jouer à la Chkobba — règles (Chkobba)</title>',
+        '<title>How to play Chkobba — rules (Chkobba)</title>',
       )
       .replace(
         /<meta name="description" content="[^"]*">/,
-        '<meta name="description" content="Apprenez les règles de la Chkobba (chkobba) : captures, comptage des points, Bermila, Dinari, 7 Haya. Guide simple pour bien commencer avant de jouer en ligne.">',
+        '<meta name="description" content="Learn the rules of Chkobba (Chkobba): capturing, scoring (Carta, Dinari, Bermila), and 7 Haya. A simple guide before you start playing online.">',
       );
   }
   return html;

@@ -19,7 +19,7 @@ export function HowToPlayScreen() {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="min-h-[100dvh] relative overflow-x-hidden overflow-y-auto bg-transparent flex flex-col"
+      className="min-h-[100dvh] relative bg-transparent flex flex-col"
       aria-labelledby="how-to-play-title"
     >
       <div className="relative z-10 w-full max-w-5xl mx-auto px-5 sm:px-8 py-10 sm:py-14">
@@ -29,7 +29,7 @@ export function HowToPlayScreen() {
           className="mb-6 inline-flex items-center gap-2 rounded-xl border border-white/[0.08] bg-black/25 backdrop-blur px-4 py-2 text-xs sm:text-sm font-ancient text-cream/75 hover:text-brass/90 hover:border-brass/20 transition-colors"
         >
           <span aria-hidden>←</span>
-          Accueil
+          Home
         </button>
 
         <header className="mb-8 sm:mb-10">
@@ -37,11 +37,11 @@ export function HowToPlayScreen() {
             id="how-to-play-title"
             className="text-[clamp(2rem,7vw,3.5rem)] font-black leading-[1.02] tracking-tight text-transparent bg-clip-text bg-gradient-to-b from-[#f5e6a8] via-brass to-[#a67c1a] drop-shadow-[0_2px_22px_rgba(212,175,55,0.14)]"
           >
-            Comment jouer à la Chkobba (Chkobba)
+            How to play Chkobba (Chkobba)
           </h1>
           <p className="mt-3 max-w-3xl text-sm sm:text-base text-cream/70 font-ancient leading-relaxed tracking-wide">
-            Règles authentiques de la chkobba tunisienne, expliquées simplement. Vous pouvez jouer en ligne sur mobile ou ordinateur,
-            puis revenir à la table pour créer une salle et inviter vos amis.
+            Authentic Tunisian Chkobba rules, explained simply. You can play online on mobile or desktop,
+            then come back to create a room and invite your friends.
           </p>
         </header>
 

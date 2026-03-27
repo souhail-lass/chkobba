@@ -1,47 +1,47 @@
 /**
- * Full rules / FAQ copy for the landing "Règles du jeu" modal (French, SEO-friendly).
+ * Rules / FAQ copy for the How-to-Play page.
  */
 export function ChkobbaRulesContent() {
   return (
     <div className="text-left space-y-10 pt-2">
       <div>
-        <h2 className="text-2xl sm:text-3xl font-ancient text-brass text-center mb-6">Comment jouer à la Chkobba ?</h2>
+        <h2 className="text-2xl sm:text-3xl font-ancient text-brass text-center mb-6">How to play Chkobba</h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <div className="glass-panel-heavy p-5 rounded-2xl border-brass/10">
             <div className="text-brass font-ancient text-xl mb-2">01.</div>
-            <h3 className="text-lg text-cream font-bold mb-2">La Distribution</h3>
+            <h3 className="text-lg text-cream font-bold mb-2">The deal</h3>
             <p className="text-cream/60 text-sm leading-relaxed">
-              Chaque joueur reçoit 3 cartes, et 4 cartes sont posées face visible sur la table. Le jeu se joue avec un jeu de 40 cartes traditionnel.
+              Each player receives 3 cards, and 4 cards are placed face up on the table. The game is played with a traditional 40-card deck.
             </p>
           </div>
           <div className="glass-panel-heavy p-5 rounded-2xl border-brass/10">
             <div className="text-brass font-ancient text-xl mb-2">02.</div>
-            <h3 className="text-lg text-cream font-bold mb-2">La Capture</h3>
+            <h3 className="text-lg text-cream font-bold mb-2">Capturing</h3>
             <p className="text-cream/60 text-sm leading-relaxed">
-              À votre tour, jouez une carte. Si sa valeur correspond à une carte sur la table ou à la somme de plusieurs cartes, vous les capturez.
+              On your turn, play a card. If its value matches a card on the table (or the sum of multiple cards), you capture them.
             </p>
           </div>
           <div className="glass-panel-heavy p-5 rounded-2xl border-brass/10">
             <div className="text-brass font-ancient text-xl mb-2">03.</div>
             <h3 className="text-lg text-cream font-bold mb-2">La Chkobba</h3>
             <p className="text-cream/60 text-sm leading-relaxed">
-              Si vous capturez la dernière carte de la table, vous faites une &quot;Chkobba&quot; et gagnez un point supplémentaire immédiat.
+              If you capture the last card on the table, you make a &quot;Chkobba&quot; and immediately gain 1 extra point.
             </p>
           </div>
         </div>
       </div>
 
       <section className="glass-panel-heavy p-6 sm:p-8 rounded-3xl border-brass/10 space-y-6">
-        <h2 className="text-2xl font-ancient text-brass">Règles de la Chkobba : le décompte des points</h2>
+        <h2 className="text-2xl font-ancient text-brass">Scoring</h2>
         <p className="text-cream/70 text-sm leading-relaxed">
-          Pour gagner à la Chkobba en ligne sur chkobba.app, vous devez atteindre le score cible de la table (souvent 21 points). Voici comment les points sont calculés à la fin de chaque manche :
+          To win a match, your team must reach the table&apos;s target score (often 21). Here&apos;s how points are counted at the end of each round:
         </p>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           {[
-            { title: 'Carta (les cartes)', body: "L'équipe qui a capturé plus de 20 cartes gagne 1 point." },
-            { title: 'Dinari (les carreaux)', body: "L'équipe qui a plus de 5 cartes de carreau gagne 1 point." },
-            { title: 'Bermila (les sept)', body: "L'équipe qui a le plus de 7 (ou de 6 en cas d'égalité) gagne 1 point." },
-            { title: 'Sabaa El Haya (7 de carreau)', body: 'Le joueur qui capture le 7 de carreau gagne automatiquement 1 point.' },
+            { title: 'Carta (most cards)', body: 'The team that captured more than 20 cards earns 1 point.' },
+            { title: 'Dinari (diamonds)', body: 'The team with more than 5 diamonds earns 1 point.' },
+            { title: 'Bermila (sevens)', body: 'The team with the most 7s (or 6s as a tiebreaker) earns 1 point.' },
+            { title: 'Sabaa El Haya (7 of diamonds)', body: 'Whoever captures the 7 of diamonds automatically earns 1 point.' },
           ].map((row) => (
             <div key={row.title} className="flex gap-3">
               <div className="w-9 h-9 rounded-full bg-brass/20 flex items-center justify-center flex-shrink-0 text-brass font-bold text-sm">1</div>
@@ -55,28 +55,28 @@ export function ChkobbaRulesContent() {
       </section>
 
       <section className="space-y-4">
-        <h2 className="text-2xl font-ancient text-brass text-center">Foire aux questions (FAQ)</h2>
+        <h2 className="text-2xl font-ancient text-brass text-center">FAQ</h2>
         <div className="space-y-3">
           {[
             {
-              q: 'Peut-on jouer à la Chkobba en ligne gratuitement ?',
-              a: 'Oui, sur chkobba.app, vous pouvez jouer gratuitement sans inscription et sans téléchargement.',
+              q: 'Can I play Chkobba online for free?',
+              a: 'Yes — on chkobba.app you can play for free with no signup and no download.',
             },
             {
-              q: 'Comment jouer avec des amis à distance ?',
-              a: "Il suffit de créer une table, de copier le code de la chambre et de l'envoyer à vos amis pour qu'ils rejoignent votre partie en temps réel.",
+              q: 'How do I play with friends remotely?',
+              a: 'Create a table, copy the room code, and send it to your friends so they can join in real time.',
             },
             {
-              q: 'Le jeu est-il disponible sur mobile ?',
-              a: 'Absolument. Chkobba.app est une Web App optimisée pour tous les navigateurs mobiles, iPhone et Android.',
+              q: 'Is the game available on mobile?',
+              a: 'Yes. Chkobba.app is a web app optimized for mobile browsers on iPhone and Android.',
             },
             {
-              q: 'Quelles sont les différences entre Chkobba et Scopa ?',
-              a: 'La Chkobba est la variante tunisienne de la Scopa italienne. Les règles de base sont identiques, mais le décompte des points (Carta, Dinari, Bermila) est spécifique à la tradition tunisienne.',
+              q: 'What is the difference between Chkobba and Scopa?',
+              a: 'Chkobba is the Tunisian variant of Italian Scopa. Core rules are similar, but scoring (Carta, Dinari, Bermila) follows the Tunisian tradition.',
             },
             {
-              q: "Peut-on jouer contre l'ordinateur (bot) ?",
-              a: 'Oui, vous pouvez ajouter des bots à votre table pour vous entraîner ou compléter une partie si vous êtes seul.',
+              q: 'Can I play against bots?',
+              a: 'Yes — you can add bots to practice or fill a table if you are alone.',
             },
           ].map((item) => (
             <details key={item.q} className="glass-panel-heavy p-4 rounded-2xl border-brass/10 group cursor-pointer">
