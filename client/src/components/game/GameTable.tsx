@@ -11,7 +11,13 @@ import { TurnIndicator } from './TurnIndicator';
 import { motion, AnimatePresence } from 'framer-motion';
 import type { RefObject } from 'react';
 
-export function GameTable({ tableShakeRef }: { tableShakeRef?: RefObject<HTMLDivElement | null> }) {
+export function GameTable({
+  tableShakeRef,
+  hideHand,
+}: {
+  tableShakeRef?: RefObject<HTMLDivElement | null>;
+  hideHand?: boolean;
+}) {
   const gameState = useGameStore((s) => s.gameState);
   const playerId = useGameStore((s) => s.playerId);
   const emoteFlashes = useEmoteStore((s) => s.flashes);
@@ -57,7 +63,7 @@ export function GameTable({ tableShakeRef }: { tableShakeRef?: RefObject<HTMLDiv
   const oppTeamCaptured = currentPlayer.team === 0 ? team1Captured : team0Captured;
 
   return (
-    <div className="flex h-full min-h-0 w-full flex-1 flex-col cafe-scene overflow-hidden px-1 pt-1 pb-0 sm:px-2 sm:pt-2 md:px-4 md:pt-4 md:pb-0 relative">
+    <div className="flex h-full min-h-0 w-full flex-1 flex-col cafe-scene overflow-x-hidden overflow-y-visible px-1 pt-2 pb-0 sm:px-2 sm:pt-3 md:px-4 md:pt-4 md:pb-0 relative">
       <CaptureAnimationOverlay />
       <DealingAnimation />
 
@@ -69,17 +75,18 @@ export function GameTable({ tableShakeRef }: { tableShakeRef?: RefObject<HTMLDiv
       {/* The Wooden Table Scene — flex-1 consumes space above hand + turn strip */}
       {/* calc(100vw-38rem): keep wood frame clear of fixed radio (~276px) + scoreboard + gaps on 13–15" 1080p */}
       <div
-        className="relative w-full flex-1 min-h-0 mx-auto flex flex-col items-stretch justify-center z-10 perspective-1000 overflow-hidden min-w-0
-        scale-[0.76] min-[400px]:scale-[0.82] sm:scale-90 md:scale-100
-        max-w-[min(72rem,calc(100vw-2rem))] md:max-w-[min(72rem,calc(100vw-38rem))]"
+        className="relative w-full flex-1 min-h-0 mx-auto flex flex-col items-stretch justify-center z-10 perspective-1000 overflow-visible min-w-0 pt-2 sm:pt-3
+        scale-[0.78] min-[420px]:scale-[0.85] sm:scale-90 md:scale-[0.96] lg:scale-100
+        max-w-[min(72rem,calc(100vw-2rem))] md:max-w-[min(72rem,calc(100vw-min(24rem,28vw)))] xl:max-w-[min(72rem,calc(100vw-36rem))]"
       >
 
         {/* Table Container */}
-        <div 
-          className="w-full flex-1 min-h-0 max-h-full p-1.5 sm:p-4 md:p-6 flex flex-col relative overflow-hidden bg-wood shadow-theme-lg hide-scrollbar"
+        <div
+          className="w-full flex-1 min-h-0 max-h-full p-1.5 sm:p-4 md:p-6 flex flex-col relative overflow-hidden bg-wood shadow-theme-lg"
           style={{
             borderRadius: 'clamp(1rem, 5vw, 3rem)',
             border: 'clamp(4px, 1.5vw, 12px) solid #2d1606',
+            contain: 'layout style',
           }}
         >
           {/* Subtle wood grain texture */}
@@ -97,11 +104,11 @@ export function GameTable({ tableShakeRef }: { tableShakeRef?: RefObject<HTMLDiv
               borderColor: 'rgba(0,0,0,0.5)',
             }}
             transition={{ duration: 2, repeat: Infinity }}
-            className="flex-1 w-full min-h-0 rounded-[clamp(0.75rem, 4vw, 2rem)] flex flex-col relative overflow-hidden border-2 bg-felt-luxury hide-scrollbar"
+            className="flex-1 w-full min-h-0 rounded-[clamp(0.75rem, 4vw, 2rem)] flex flex-col relative overflow-hidden border-2 bg-felt-luxury"
           >
             {/* Grid Layout inside the Felt */}
             <div
-              className="flex-1 w-full h-full min-h-0 min-w-0 relative z-10 flex flex-col justify-center items-center py-2 sm:py-6 md:py-10 overflow-hidden hide-scrollbar"
+              className="flex-1 w-full h-full min-h-0 min-w-0 relative z-10 flex flex-col justify-center items-center py-2 sm:py-6 md:py-10"
               data-table-felt-center
             >
 
@@ -125,7 +132,7 @@ export function GameTable({ tableShakeRef }: { tableShakeRef?: RefObject<HTMLDiv
         </div>
 
         {/* Player Zones (positioned around the table) */}
-        <div className="absolute top-[-5px] sm:top-[-20px] left-1/2 -translate-x-1/2 z-30">
+        <div className="absolute top-0 sm:top-1 left-1/2 -translate-x-1/2 z-30">
           {topPlayer && (
             <PlayerZone
               player={topPlayer}
@@ -138,7 +145,7 @@ export function GameTable({ tableShakeRef }: { tableShakeRef?: RefObject<HTMLDiv
         </div>
 
         {is4Player && leftPlayer && (
-          <div className="absolute left-[-5px] sm:left-[-30px] md:left-[-40px] top-1/2 -translate-y-1/2 z-30">
+          <div className="absolute left-0 sm:left-1 md:left-2 top-1/2 -translate-y-1/2 z-30">
             <PlayerZone
               player={leftPlayer}
               position="left"
@@ -150,7 +157,7 @@ export function GameTable({ tableShakeRef }: { tableShakeRef?: RefObject<HTMLDiv
         )}
 
         {is4Player && rightPlayer && (
-          <div className="absolute right-[-5px] sm:right-[-30px] md:right-[-40px] top-1/2 -translate-y-1/2 z-30">
+          <div className="absolute right-0 sm:right-1 md:right-2 top-1/2 -translate-y-1/2 z-30">
             <PlayerZone
               player={rightPlayer}
               position="right"
@@ -165,25 +172,27 @@ export function GameTable({ tableShakeRef }: { tableShakeRef?: RefObject<HTMLDiv
       <TurnIndicator />
 
       {/* Hand — pinned to bottom of scene (no dead band under sub–1440×1100 viewports) */}
-      <div className="relative mt-auto shrink-0 w-full max-w-[min(42rem,calc(100vw-0.5rem))] mx-auto z-30 px-1 sm:px-2 pb-[max(0.25rem,env(safe-area-inset-bottom))]">
-        <AnimatePresence>
-          {emoteFlashes[playerId] && (
-            <motion.div
-              key={`self-${emoteFlashes[playerId]!.label}`}
-              initial={{ opacity: 0, y: 4 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -6 }}
-              className="absolute -top-1 left-1/2 z-40 -translate-x-1/2 -translate-y-full flex items-center gap-1.5 rounded-lg border border-brass/40 bg-black/85 px-2 py-1 shadow-lg pointer-events-none"
-            >
-              <span className="text-lg leading-none">{emoteFlashes[playerId]!.icon}</span>
-              <span className="font-ancient text-[9px] sm:text-[10px] text-cream uppercase tracking-wider">
-                {emoteFlashes[playerId]!.label}
-              </span>
-            </motion.div>
-          )}
-        </AnimatePresence>
-        <PlayerHand />
-      </div>
+      {!hideHand && (
+        <div className="relative mt-auto shrink-0 w-full max-w-[min(42rem,calc(100vw-0.5rem))] mx-auto z-30 px-1 sm:px-2 pb-[max(0.25rem,env(safe-area-inset-bottom))]">
+          <AnimatePresence>
+            {emoteFlashes[playerId] && (
+              <motion.div
+                key={`self-${emoteFlashes[playerId]!.label}`}
+                initial={{ opacity: 0, y: 4 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -6 }}
+                className="absolute -top-1 left-1/2 z-40 -translate-x-1/2 -translate-y-full flex items-center gap-1.5 rounded-lg border border-brass/40 bg-black/85 px-2 py-1 shadow-lg pointer-events-none"
+              >
+                <span className="text-lg leading-none">{emoteFlashes[playerId]!.icon}</span>
+                <span className="font-ancient text-[9px] sm:text-[10px] text-cream uppercase tracking-wider">
+                  {emoteFlashes[playerId]!.label}
+                </span>
+              </motion.div>
+            )}
+          </AnimatePresence>
+          <PlayerHand />
+        </div>
+      )}
     </div>
   );
 }

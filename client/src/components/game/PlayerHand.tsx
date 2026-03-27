@@ -7,7 +7,7 @@ import { stopCelebrationPlayback } from '../../lib/playAssetSound';
 import { useRef, useEffect, useState, useCallback } from 'react';
 import gsap from 'gsap';
 
-export function PlayerHand() {
+export function PlayerHand({ hidePlayButton }: { hidePlayButton?: boolean } = {}) {
   const { gameState, playerId, selectedCardIndex, setSelectedCard, selectedTableIndices, clearSelections, isDistributing } = useGameStore();
   const { playCardPlace, playCardHover } = useAmbianceSound();
   const handFlightRefs = useRef<(HTMLDivElement | null)[]>([]);
@@ -196,28 +196,30 @@ export function PlayerHand() {
           })}
       </div>
 
-      <motion.button
-        initial={{ opacity: 0, y: 12 }}
-        animate={{
-          opacity: isMyTurn ? 1 : 0,
-          y: isMyTurn ? 0 : 12,
-          scale: 1,
-        }}
-        transition={{ duration: 0.25, ease: 'easeOut' }}
-        onClick={handleConfirmPlay}
-        disabled={!canClickPlay}
-        className={`absolute right-0 sm:-right-8 bottom-10 px-3 sm:px-6 py-2 rounded-lg font-ancient font-bold tracking-widest uppercase text-[10px] sm:text-sm transition-all duration-300 min-w-[44px] min-h-[44px] flex items-center justify-center ${
-          canClickPlay
-            ? 'bg-emerald-600 border-2 border-emerald-400/60 text-white shadow-[0_0_16px_rgba(16,185,129,0.4)] cursor-pointer hover:bg-emerald-500 hover:shadow-[0_0_24px_rgba(16,185,129,0.5)]'
-            : playPending
-              ? 'bg-emerald-800/80 border-2 border-emerald-500/40 text-emerald-100 opacity-90 cursor-wait'
-              : selectedTableIndices.length > 0 && !isValidCapture && canConfirm
-                ? 'bg-red-900/60 border-2 border-red-500/40 text-red-300 opacity-70 cursor-not-allowed'
-                : 'bg-wood-dark border-2 border-wood-light text-foreground-muted opacity-40 cursor-not-allowed'
-        }`}
-      >
-        {playPending ? '…' : getButtonLabel()}
-      </motion.button>
+      {!hidePlayButton && (
+        <motion.button
+          initial={{ opacity: 0, y: 12 }}
+          animate={{
+            opacity: isMyTurn ? 1 : 0,
+            y: isMyTurn ? 0 : 12,
+            scale: 1,
+          }}
+          transition={{ duration: 0.25, ease: 'easeOut' }}
+          onClick={handleConfirmPlay}
+          disabled={!canClickPlay}
+          className={`absolute right-0 sm:-right-8 bottom-10 px-3 sm:px-6 py-2 rounded-lg font-ancient font-bold tracking-widest uppercase text-[10px] sm:text-sm transition-all duration-300 min-w-[44px] min-h-[44px] flex items-center justify-center ${
+            canClickPlay
+              ? 'bg-emerald-600 border-2 border-emerald-400/60 text-white shadow-[0_0_16px_rgba(16,185,129,0.4)] cursor-pointer hover:bg-emerald-500 hover:shadow-[0_0_24px_rgba(16,185,129,0.5)]'
+              : playPending
+                ? 'bg-emerald-800/80 border-2 border-emerald-500/40 text-emerald-100 opacity-90 cursor-wait'
+                : selectedTableIndices.length > 0 && !isValidCapture && canConfirm
+                  ? 'bg-red-900/60 border-2 border-red-500/40 text-red-300 opacity-70 cursor-not-allowed'
+                  : 'bg-wood-dark border-2 border-wood-light text-foreground-muted opacity-40 cursor-not-allowed'
+          }`}
+        >
+          {playPending ? '…' : getButtonLabel()}
+        </motion.button>
+      )}
 
       {!isMyTurn && (
         <motion.div

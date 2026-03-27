@@ -117,10 +117,14 @@ export function LandingScreen() {
           </p>
           <h1
             id="landing-title"
-            className="text-[clamp(1.82rem,7.4vw,3.65rem)] font-black leading-[0.9] tracking-tight drop-shadow-[0_2px_24px_rgba(212,175,55,0.18)] overflow-visible px-1"
+            className="text-[clamp(1.82rem,7.4vw,3.65rem)] font-black leading-[0.9] tracking-tight overflow-visible px-1 text-[#f2e4b8]"
+            style={{
+              textShadow:
+                '0 1px 0 #6b5218, 0 3px 14px rgba(0,0,0,0.85), 0 0 28px rgba(212,175,55,0.35)',
+            }}
           >
-            <span className="relative z-[1] text-transparent bg-clip-text bg-gradient-to-b from-[#f5e6a8] via-brass to-[#a67c1a]">
-              <span className="landing-title-shimmer block uppercase tracking-[0.045em] px-[0.08em] overflow-visible">
+            <span className="landing-title-shimmer relative isolate inline-block uppercase tracking-[0.045em] px-[0.08em] overflow-visible">
+              <span className="relative z-10 text-transparent bg-clip-text bg-gradient-to-b from-[#fff9e8] via-brass to-[#8a7018]">
                 CHKOBBA
               </span>
             </span>

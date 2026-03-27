@@ -2,6 +2,7 @@ import { useEffect, useRef, useState, type RefObject } from 'react';
 import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useGameStore } from '../../stores/useGameStore';
+import { useIsMobile } from '../../hooks/useIsMobile';
 import { GameTable } from '../game/GameTable';
 import { Scoreboard } from '../game/Scoreboard';
 import { MoveLog } from '../game/MoveLog';
@@ -16,6 +17,7 @@ import { useUIStore } from '../../stores/useUIStore';
 import { socket } from '../../lib/socket';
 import { Button } from '../ui/Button';
 import { SoundEffectsControls } from '../game/SoundEffectsControls';
+import { MobileGameLayout } from '../mobile/MobileGameLayout';
 
 export function GameScreen() {
   const gameState = useGameStore((s) => s.gameState);
@@ -23,8 +25,8 @@ export function GameScreen() {
   const gameType = useGameStore((s) => s.gameType || s.room?.gameType);
   const playerId = useGameStore((s) => s.playerId);
   const autoWinWarning = useGameStore((s) => s.autoWinWarning);
-
   const isDistributing = useGameStore((s) => s.isDistributing);
+  const isMobile = useIsMobile();
 
   const { playClink, playLighter, playCardShuffle } = useAmbianceSound();
   const lighterPlayed = useRef(false);
@@ -77,6 +79,36 @@ export function GameScreen() {
     setTimeout(() => setCopied(false), 2000);
   };
 
+  // Mobile layout (< 640px)
+  if (isMobile) {
+    return (
+      <motion.section
+        id="game-screen"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        transition={{ duration: 0.5 }}
+        className="h-[100dvh] max-h-[100dvh] relative overflow-hidden bg-transparent"
+      >
+        {/* Ambient lighting divs — same as desktop */}
+        <div className="absolute inset-0 pointer-events-none" style={{
+          background: 'radial-gradient(ellipse at 50% 30%, rgba(212,175,55,0.06) 0%, transparent 50%), radial-gradient(ellipse at 50% 100%, rgba(90,53,32,0.15) 0%, transparent 40%)'
+        }} />
+        <div className="absolute top-0 right-10 w-40 h-40 bg-amber-900/8 rounded-full blur-[80px] pointer-events-none" />
+        <div className="absolute bottom-10 left-10 w-32 h-32 bg-turquoise/3 rounded-full blur-[100px] pointer-events-none" />
+
+        <MobileGameLayout
+          tableShakeRef={tableShakeRef}
+          autoWinWarning={autoWinWarning}
+          onCopyCode={handleCopyCode}
+          copied={copied}
+          gameState={gameState}
+          playerId={playerId}
+        />
+      </motion.section>
+    );
+  }
+
   return (
     <motion.section
       id="game-screen"
@@ -84,7 +116,7 @@ export function GameScreen() {
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
       transition={{ duration: 0.5 }}
-      className="game-laptop-density h-[100dvh] max-h-[100dvh] min-h-0 flex flex-col px-1 pt-1 sm:px-2 sm:pt-2 pb-0 relative overflow-hidden bg-transparent"
+      className="game-laptop-density h-[100dvh] max-h-[100dvh] min-h-0 flex flex-col px-1 pt-1 sm:px-2 sm:pt-2 pb-0 relative overflow-x-hidden bg-transparent"
     >
       {/* Cinematic Background (Provided by App.tsx) */}
       
@@ -95,10 +127,8 @@ export function GameScreen() {
       <div className="absolute top-0 right-10 w-40 h-40 bg-amber-900/8 rounded-full blur-[80px] pointer-events-none" />
       <div className="absolute bottom-10 left-10 w-32 h-32 bg-turquoise/3 rounded-full blur-[100px] pointer-events-none" />
 
-      {/* Vintage Radio - Hidden on mobile or moved to absolute corner */}
-      <div className="hidden md:block">
-        <VintageRadio />
-      </div>
+      {/* Vintage Radio - Minimized icon on mobile, full widget on md+ */}
+      <VintageRadio />
 
       {/* Scoreboard */}
       <Scoreboard />
@@ -106,13 +136,13 @@ export function GameScreen() {
       {/* Action Log — Desktop only */}
       <MoveLog />
 
-      {/* SFX + room code — bottom right (chat stays bottom-left; radio is separate) */}
-      <div className="fixed bottom-[max(0.75rem,env(safe-area-inset-bottom))] right-[max(0.75rem,env(safe-area-inset-right))] z-[45] flex flex-col gap-1.5 w-[min(16rem,calc(100vw-8rem))]">
+      {/* SFX + room code — top right on mobile (below scoreboard), bottom right on sm+ */}
+      <div className="fixed top-[max(9.5rem,env(safe-area-inset-top)+9rem)] sm:top-auto sm:bottom-[max(0.75rem,env(safe-area-inset-bottom))] right-[max(0.75rem,env(safe-area-inset-right))] z-[45] flex flex-col gap-1.5 w-[min(11rem,calc(100vw-5rem))] sm:w-[min(16rem,calc(100vw-8rem))]">
         <SoundEffectsControls />
         <motion.button
           type="button"
           whileTap={{ scale: 0.98 }}
-          className="hidden sm:inline-flex w-full items-center justify-center gap-2 bg-black/40 backdrop-blur-md border border-brass/20 rounded-lg px-3 py-1.5 cursor-pointer hover:bg-black/60 transition-colors group relative shadow-inner-dark min-h-[36px]"
+          className="inline-flex w-full items-center justify-center gap-2 bg-black/40 backdrop-blur-md border border-brass/20 rounded-lg px-3 py-1.5 cursor-pointer hover:bg-black/60 transition-colors group relative shadow-inner-dark min-h-[36px]"
           onClick={handleCopyCode}
         >
           <AnimatePresence>
@@ -137,7 +167,7 @@ export function GameScreen() {
         </motion.button>
       </div>
 
-      <div className="relative z-10 flex-1 min-h-0 flex flex-col overflow-hidden min-w-0">
+      <div className="relative z-10 flex-1 min-h-0 flex flex-col overflow-x-hidden overflow-y-visible min-w-0">
         <GameTable tableShakeRef={tableShakeRef} />
       </div>
 

@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import { useSocket } from './hooks/useSocket';
 import { useUIStore } from './stores/useUIStore';
+import { useIsMobile } from './hooks/useIsMobile';
 import { ChatPanel } from './components/layout/ChatPanel';
 import { Toast } from './components/ui/Toast';
 import { LandingScreen } from './components/screens/LandingScreen';
@@ -16,6 +17,7 @@ export default function App() {
   useSocket();
   const screen = useUIStore((s) => s.screen);
   const setScreen = useUIStore((s) => s.setScreen);
+  const isMobile = useIsMobile();
 
   useEffect(() => {
     trackPageView(screen);
@@ -68,7 +70,7 @@ export default function App() {
         </main>
         <Toast />
       </div>
-      {screen === 'game' && <ChatPanel />}
+      {screen === 'game' && <ChatPanel hideTrigger={isMobile} />}
     </>
   );
 }

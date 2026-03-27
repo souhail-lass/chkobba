@@ -24,7 +24,8 @@
       "Bash(find . -maxdepth 1 -type f -size +1M | xargs ls -lh)",
       "Bash(cd \"C:\\\\Users\\\\mrabt\\\\OneDrive\\\\Desktop\\\\chkobba\\\\Chkobba\" && find ./client/public -type f | sort && echo \"---\" && find ./client/src -path '*/public/*' -o -name '*.tsx' -o -name '*.ts' | xargs grep -l 'tun1\\\\|tun2\\\\|tunisia\\\\|nv_pics\\\\|sound/\\\\|/pics/' 2>/dev/null | head -20)",
       "Bash(cd \"C:\\\\Users\\\\mrabt\\\\OneDrive\\\\Desktop\\\\chkobba\\\\Chkobba\" && rm -f '$null' T.jpg cap1.png cap2.png picture.png prob.png prototype.png prototype2.png quadrilato.png tun1.jpg tun2.jpg tunisia.png && rm -rf pics/ nv_pics/ sound/ && rm -f client/public/tun2.jpg && echo \"Done\")",
-      "Bash(cd \"C:\\\\Users\\\\mrabt\\\\OneDrive\\\\Desktop\\\\chkobba\\\\Chkobba/client/src\" && rm -f components/layout/ThemeToggle.tsx components/ui/Badge.tsx components/ui/Select.tsx types/socket.ts && echo \"Done\")"
+      "Bash(cd \"C:\\\\Users\\\\mrabt\\\\OneDrive\\\\Desktop\\\\chkobba\\\\Chkobba/client/src\" && rm -f components/layout/ThemeToggle.tsx components/ui/Badge.tsx components/ui/Select.tsx types/socket.ts && echo \"Done\")",
+      "Bash(ls:*)"
     ]
   }
 }

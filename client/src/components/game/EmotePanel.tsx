@@ -76,9 +76,7 @@ export function EmotePanel({ alignPopoverRight = false }: { alignPopoverRight?: 
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 6, scale: 0.98 }}
             transition={{ type: 'spring', stiffness: 420, damping: 32 }}
-            className={`absolute bottom-full mb-2 w-[min(24rem,calc(100vw-1rem))] max-h-[min(85vh,560px)] overflow-y-auto rounded-xl border-2 border-[#b8942f]/60 bg-[#0f2419]/98 shadow-[0_12px_40px_rgba(0,0,0,0.55)] p-2 z-[220] ${
-              alignPopoverRight ? 'right-0 left-auto' : 'left-0 right-auto'
-            }`}
+            className={`absolute bottom-full mb-2 w-[min(20rem,calc(100vw-8rem))] sm:w-[min(22rem,calc(100vw-1.5rem))] max-h-[min(70vh,560px)] overflow-y-auto rounded-xl border-2 border-[#b8942f]/60 bg-[#0f2419]/98 shadow-[0_12px_40px_rgba(0,0,0,0.55)] p-2 z-[220] left-0 right-auto`}
             role="dialog"
             aria-label="Sound emotes"
           >
@@ -170,11 +168,11 @@ export function EmotePanel({ alignPopoverRight = false }: { alignPopoverRight?: 
         type="button"
         onClick={() => setOpen((o) => !o)}
         aria-expanded={open}
-        className="relative flex h-[41px] min-h-[41px] w-[41px] shrink-0 items-center justify-center rounded-t-xl rounded-b-sm bg-[#1a3d2b] border-2 border-[#b8942f] text-cream/90 hover:text-white hover:bg-[#142f22] shadow-lg transition-all cursor-pointer box-border"
+        className="relative flex h-[36px] min-h-[36px] w-[36px] sm:h-[41px] sm:min-h-[41px] sm:w-[41px] shrink-0 items-center justify-center rounded-t-xl rounded-b-sm bg-[#1a3d2b] border-2 border-[#b8942f] text-cream/90 hover:text-white hover:bg-[#142f22] shadow-lg transition-all cursor-pointer box-border"
         title="Sound emotes — table + default fanfares"
         aria-label="Open sound emotes"
       >
-        <span className="text-[17px] leading-none" aria-hidden>
+        <span className="text-[15px] sm:text-[17px] leading-none" aria-hidden>
           🔊
         </span>
       </button>

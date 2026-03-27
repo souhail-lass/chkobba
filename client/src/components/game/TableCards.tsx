@@ -35,8 +35,8 @@ export function TableCards({ cards }: TableCardsProps) {
 
   /** Animate only newly added cards — full table deal + each new play — not the whole grid on every state tick. */
   useEffect(() => {
-    if (cards.length === 0 || isDistributing) {
-      if (cards.length === 0) prevLenRef.current = 0;
+    if (cards.length === 0) {
+      prevLenRef.current = 0;
       return;
     }
 
@@ -59,27 +59,36 @@ export function TableCards({ cards }: TableCardsProps) {
 
       gsap.killTweensOf(targets);
 
-      gsap.from(targets, {
-        y: -6,
-        opacity: 0,
-        duration: 0.14,
-        stagger: 0.02,
-        ease: 'power2.out',
-      });
+      gsap.fromTo(
+        targets,
+        { y: -6, opacity: 0 },
+        {
+          y: 0,
+          opacity: 1,
+          duration: 0.14,
+          stagger: 0.02,
+          ease: 'power2.out',
+        },
+      );
     });
-  }, [keySig, cards.length, isDistributing]);
+  }, [keySig, cards.length]);
 
-  if (cards.length === 0 || isDistributing) {
+  if (cards.length === 0) {
     return (
       <div className="flex items-center justify-center min-h-[var(--card-height)] p-4">
-        {!isDistributing && <span className="text-cream-dark/30 italic text-sm font-ancient">Table is empty</span>}
+        <span className="text-cream-dark/30 italic text-sm font-ancient">Table is empty</span>
       </div>
     );
   }
 
   return (
-    <div className="relative z-40 w-full min-w-0 max-w-full min-h-[min(200px,28vh)] sm:min-h-[200px] px-2 sm:px-4 py-3 sm:py-4 box-border pointer-events-auto">
-      <div className="flex flex-wrap justify-center items-center gap-2 sm:gap-3 w-full max-w-full min-w-0 mx-auto [contain:layout_style]">
+    <div
+      className="relative z-40 w-full min-w-0 max-w-full flex items-center justify-center px-2 sm:px-4 py-2 sm:py-4 box-border pointer-events-auto"
+      style={{
+        minHeight: 'clamp(70px, 12vh, 150px)',
+      }}
+    >
+      <div className="flex flex-wrap justify-center items-center gap-2 sm:gap-3 w-full max-w-full min-w-0 mx-auto">
         {cards.map((card, index) => {
           const isSelected = selectedTableIndices.includes(index);
           return (
@@ -88,8 +97,11 @@ export function TableCards({ cards }: TableCardsProps) {
               ref={(el) => {
                 cardWrapRefs.current[index] = el;
               }}
-              className="relative cursor-pointer shrink-0 [transform:translateZ(0)]"
-              style={{ transformOrigin: 'center bottom' }}
+              className="relative cursor-pointer shrink-0"
+              style={{
+                transformOrigin: 'center bottom',
+                transform: 'translateZ(0)',
+              }}
               onClick={() => handleTableCardClick(index)}
             >
               <Card card={card} selected={isSelected} selectable={isMyTurn} />

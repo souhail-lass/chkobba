@@ -22,7 +22,7 @@ export function VintageRadio() {
   const [tuningAngle, setTuningAngle] = useState(0);
   const [volumeAngle, setVolumeAngle] = useState(94); // 35% of 270
   const [apiReady, setApiReady] = useState(false);
-  const [isMinimized, setIsMinimized] = useState(false);
+  const [isMinimized, setIsMinimized] = useState(() => window.innerWidth < 768);
   const playerInitRef = useRef(false);
   const titleRef = useRef<HTMLDivElement>(null);
   const [needsScroll, setNeedsScroll] = useState(false);
@@ -329,9 +329,10 @@ export function VintageRadio() {
           animate={{ opacity: 1, y: 0 }}
           whileHover={{ scale: 1.1 }}
           whileTap={{ scale: 0.95 }}
-          onClick={() => setIsMinimized(false)}
+          onClick={() => isMobile ? togglePlay() : setIsMinimized(false)}
           className="fixed top-[max(5rem,env(safe-area-inset-top)+1rem)] left-[max(0.5rem,env(safe-area-inset-left))] z-50 cursor-pointer"
-          title="Open Radio"
+          title={isMobile ? (isPlaying ? 'Pause radio' : 'Play radio') : 'Open Radio'}
+          aria-label={isMobile ? (isPlaying ? 'Pause café radio' : 'Play café radio') : 'Expand radio controls'}
           style={{
             width: isMobile ? 36 : 48,
             height: isMobile ? 36 : 48,

@@ -285,9 +285,12 @@ export function Scoreboard() {
                 myScore >= oppScore ? 'border-accent/70 ring-1 ring-accent/30' : 'border-white/15'
               }`}
             />
-            <span className={`text-[10px] sm:text-[11px] font-ancient uppercase font-black tracking-widest truncate w-full max-w-[88px] ${
-              myScore >= oppScore ? 'text-accent' : 'text-cream/40'
-            }`}>
+            <span
+              className={`text-[10px] sm:text-[11px] font-ancient uppercase font-black tracking-widest truncate w-full max-w-[min(7.5rem,42vw)] ${
+                myScore >= oppScore ? 'text-accent' : 'text-cream/40'
+              }`}
+              title={myNickname}
+            >
               {myNickname}
             </span>
             <AnimatedNumber
@@ -316,9 +319,12 @@ export function Scoreboard() {
                 oppScore >= myScore ? 'border-turquoise/70 ring-1 ring-turquoise/30' : 'border-white/15'
               }`}
             />
-            <span className={`text-[10px] sm:text-[11px] font-ancient uppercase font-black tracking-widest truncate w-full max-w-[88px] ${
-              oppScore >= myScore ? 'text-turquoise' : 'text-cream/40'
-            }`}>
+            <span
+              className={`text-[10px] sm:text-[11px] font-ancient uppercase font-black tracking-widest truncate w-full max-w-[min(7.5rem,42vw)] ${
+                oppScore >= myScore ? 'text-turquoise' : 'text-cream/40'
+              }`}
+              title={oppNickname}
+            >
               {oppNickname}
             </span>
             <AnimatedNumber

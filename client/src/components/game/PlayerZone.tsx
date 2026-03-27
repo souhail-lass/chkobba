@@ -78,7 +78,7 @@ export function PlayerZone({
         <motion.div
           animate={isCurrentTurn ? { scale: [1, 1.4, 1] } : { scale: 1 }}
           transition={{ duration: 1.5, repeat: isCurrentTurn ? Infinity : 0 }}
-          className={`w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full ${
+          className={`w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full shrink-0 ${
             isCurrentTurn
               ? 'bg-brass shadow-[0_0_6px_rgba(212,175,55,0.8)]'
               : player.isConnected
@@ -86,11 +86,14 @@ export function PlayerZone({
                 : 'bg-red-400/50'
           }`}
         />
-        <span className="font-ancient text-[8px] sm:text-[10px] md:text-xs text-brass font-bold truncate max-w-[50px] sm:max-w-[80px]">
+        <span
+          className="font-ancient text-[9px] sm:text-[10px] md:text-[11px] text-brass font-bold min-w-0 max-w-[min(11rem,28vw)] sm:max-w-[min(12rem,22vw)] truncate"
+          title={player.nickname}
+        >
           {player.nickname}
         </span>
         {/* Team indicator badge */}
-        <span className={`text-[6px] sm:text-[7px] font-ancient font-bold uppercase tracking-wider px-1 py-0.5 rounded ${
+        <span className={`text-[6px] sm:text-[7px] font-ancient font-bold uppercase tracking-wider px-1 py-0.5 rounded shrink-0 ${
           player.team === 0
             ? 'bg-amber-600/80 text-black'
             : 'bg-teal-600/80 text-black'
@@ -101,13 +104,13 @@ export function PlayerZone({
           <motion.span
             initial={{ opacity: 0, scale: 0.8 }}
             animate={{ opacity: 1, scale: 1 }}
-            className="text-[7px] sm:text-[8px] font-ancient text-brass/70 uppercase tracking-wider"
+            className="text-[7px] sm:text-[8px] font-ancient text-brass/70 uppercase tracking-wider shrink-0 whitespace-nowrap"
           >
             playing
           </motion.span>
         )}
         {player.capturedCount > 0 && (
-          <span className="text-[9px] font-ancient text-cream-dark/50 bg-black/20 px-1 rounded">
+          <span className="text-[9px] font-ancient text-cream-dark/50 bg-black/20 px-1 rounded shrink-0">
             {player.capturedCount}
           </span>
         )}
