@@ -13,6 +13,10 @@ import Game from './game/Game.js';
 import { RummyGame } from './game/RummyGame.js';
 import { getBotMove, executeRummyBotTurn, getRandomBotName } from './game/Bot.js';
 import { generatePlayerId } from './game/Room.js';
+import { isValidGameEmoteId, GAME_EMOTE_COOLDOWN_MS } from '../shared/emotes.js';
+import { dealAnimationDurationMs, SPECIAL_CAPTURE_PAUSE_MS } from '../shared/timing.js';
+/** Per-room per-player emote spam guard */
+const lastGameEmoteAt = new Map();
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 // Initialize Express
@@ -39,6 +43,10 @@ app.get('/sitemap.xml', (req, res) => {
 app.get('/robots.txt', (req, res) => {
     res.sendFile(path.join(clientDistPath, 'robots.txt'));
 });
+// Prerendered SEO pages (static HTML generated at build time)
+app.get(['/how-to-play', '/how-to-play/'], (_req, res) => {
+    res.sendFile(path.join(clientDistPath, 'how-to-play', 'index.html'));
+});
 // Serve static files from client build
 app.use(express.static(clientDistPath));
 // Game instances stored by room ID
@@ -56,6 +64,22 @@ function clearTurnTimer(roomId) {
         clearTimeout(t);
         turnTimers.delete(roomId);
     }
+}
+/** Wait before starting AFK/bot turn timer (dealing overlay or special capture). */
+function scheduleTurnTimer(roomId, delayMs) {
+    clearTurnTimer(roomId);
+    const t = setTimeout(() => {
+        turnTimers.delete(roomId);
+        startTurnTimer(roomId);
+    }, delayMs);
+    turnTimers.set(roomId, t);
+}
+function scheduleTurnAfterDeal(roomId) {
+    const room = store.getRoom(roomId);
+    if (!room)
+        return;
+    const gt = room.gameType === 'rummy' ? 'rummy' : 'chkobba';
+    scheduleTurnTimer(roomId, dealAnimationDurationMs(gt, room.players.length));
 }
 /**
  * Get or create Chkobba game for a room
@@ -243,7 +267,12 @@ function executeBotMove(roomId, botPlayerId) {
                 // Don't start next timer — wait for humans to click Continue
                 return;
             }
-            startTurnTimer(roomId);
+            if (result.capture?.isChkobba || result.capture?.isHayya) {
+                scheduleTurnTimer(roomId, SPECIAL_CAPTURE_PAUSE_MS);
+            }
+            else {
+                startTurnTimer(roomId);
+            }
         }
     }
     catch (err) {
@@ -392,7 +421,7 @@ function handleDisconnect(socket, room, player) {
                     io.to(room.id).emit('new_round');
                 }
                 broadcastGameState(room.id);
-                startTurnTimer(room.id);
+                scheduleTurnAfterDeal(room.id);
             }
         }
     }
@@ -402,8 +431,13 @@ function handleDisconnect(socket, room, player) {
     // If game is playing, handle replacement or auto-win
     if (room.status === config.GAME_STATUS.PLAYING) {
         const opposingTeam = room.getTeam(player.team === 0 ? 1 : 0);
-        const allOpponentsDisconnected = opposingTeam.length > 0 && opposingTeam.every(p => !p.isConnected);
-        if (allOpponentsDisconnected) {
+        // Bots are stored with isConnected: true, so "opponent still connected" must ignore bots.
+        // Otherwise 1v1 human vs bot treats the bot as a connected opponent and wrongly converts
+        // the human to a bot on refresh before rejoin_game runs.
+        const opposingHumans = opposingTeam.filter((p) => !p.isBot);
+        const allHumanOpponentsDisconnected = opposingTeam.length > 0 &&
+            (opposingHumans.length === 0 || opposingHumans.every((p) => !p.isConnected));
+        if (allHumanOpponentsDisconnected) {
             // 1v1 or Team Exit: Start timer for auto-win
             if (room.disconnectTimer)
                 clearTimeout(room.disconnectTimer);
@@ -438,14 +472,21 @@ function handleDisconnect(socket, room, player) {
             }, (config.DISCONNECT_TIMEOUT_MS || 60000) / 2);
             return;
         }
-        // > 2 players or teammate still connected: Replace with bot immediately
-        console.log(`[Server] Replacing disconnected player ${player.nickname} with bot.`);
-        player.isBot = true;
-        player.isConnected = false;
-        // Auto-continue if round ended
-        const game = chkobbaGames.get(room.id) || rummyGames.get(room.id);
-        if (game && game.continuePlayers) {
-            game.continuePlayers.add(player.id);
+        // Replace with a bot only when another *human* is still in the game (teammate or opponent).
+        // If everyone else is bots, keep this seat as a disconnected human so refresh/rejoin works.
+        const hasOtherConnectedHuman = room.players.some((p) => p.id !== player.id && p.isConnected && !p.isBot);
+        if (hasOtherConnectedHuman) {
+            console.log(`[Server] Replacing disconnected player ${player.nickname} with bot.`);
+            player.isBot = true;
+            player.isConnected = false;
+            // Auto-continue if round ended
+            const game = chkobbaGames.get(room.id) || rummyGames.get(room.id);
+            if (game && game.continuePlayers) {
+                game.continuePlayers.add(player.id);
+            }
+        }
+        else {
+            console.log(`[Server] Disconnect for ${player.nickname}: no other humans in room — keeping seat for rejoin (not converting to bot).`);
         }
         broadcastRoomUpdate(room.id);
         broadcastGameState(room.id);
@@ -887,11 +928,13 @@ io.on('connection', (socket) => {
             else {
                 const game = getOrCreateChkobbaGame(currentRoom.id, currentRoom);
                 game.start();
-                startTurnTimer(currentRoom.id);
             }
             io.to(currentRoom.id).emit('game_started');
             broadcastGameState(currentRoom.id);
             broadcastRoomUpdate(currentRoom.id);
+            if (currentRoom.gameType === 'chkobba') {
+                scheduleTurnAfterDeal(currentRoom.id);
+            }
             console.log(`[Server] Auto-started ${currentRoom.gameType} game in room ${currentRoom.id} (room full and all ready)`);
         }
     });
@@ -925,7 +968,7 @@ io.on('connection', (socket) => {
         broadcastGameState(currentRoom.id);
         broadcastRoomUpdate(currentRoom.id);
         if (currentRoom.gameType === 'chkobba') {
-            startTurnTimer(currentRoom.id);
+            scheduleTurnAfterDeal(currentRoom.id);
         }
         console.log(`[Server] ${currentRoom.gameType} game started in room ${currentRoom.id}`);
     });
@@ -983,7 +1026,12 @@ io.on('connection', (socket) => {
             }
             return; // Wait for humans to click Continue
         }
-        startTurnTimer(currentRoom.id);
+        if (result.capture?.isChkobba || result.capture?.isHayya) {
+            scheduleTurnTimer(currentRoom.id, SPECIAL_CAPTURE_PAUSE_MS);
+        }
+        else {
+            startTurnTimer(currentRoom.id);
+        }
     });
     /**
      * Draw card from draw pile (Rummy)
@@ -1164,7 +1212,7 @@ io.on('connection', (socket) => {
             game.startNewRound();
             io.to(currentRoom.id).emit('new_round');
             broadcastGameState(currentRoom.id);
-            startTurnTimer(currentRoom.id);
+            scheduleTurnAfterDeal(currentRoom.id);
         }
     });
     /**
@@ -1220,10 +1268,12 @@ io.on('connection', (socket) => {
         else {
             const newGame = getOrCreateChkobbaGame(currentRoom.id, currentRoom);
             newGame.start();
-            startTurnTimer(currentRoom.id);
         }
         io.to(currentRoom.id).emit('game_started');
         broadcastGameState(currentRoom.id);
+        if (currentRoom.gameType === 'chkobba') {
+            scheduleTurnAfterDeal(currentRoom.id);
+        }
         console.log(`[Server] Room ${currentRoom.id} started a new ${currentRoom.gameType} match (Play Again)`);
     });
     /**
@@ -1280,6 +1330,25 @@ io.on('connection', (socket) => {
             playerNickname: currentPlayer.nickname,
             message: sanitizedMessage,
             timestamp: Date.now()
+        });
+    });
+    /**
+     * Sound emote — broadcast to room (cooldown per player)
+     */
+    socket.on('game_emote', ({ emoteId }) => {
+        if (!currentRoom || !currentPlayer)
+            return;
+        if (!isValidGameEmoteId(emoteId))
+            return;
+        const key = `${currentRoom.id}:${currentPlayer.id}`;
+        const now = Date.now();
+        const prev = lastGameEmoteAt.get(key) ?? 0;
+        if (now - prev < GAME_EMOTE_COOLDOWN_MS)
+            return;
+        lastGameEmoteAt.set(key, now);
+        io.to(currentRoom.id).emit('game_emote', {
+            playerId: currentPlayer.id,
+            emoteId,
         });
     });
     /**
